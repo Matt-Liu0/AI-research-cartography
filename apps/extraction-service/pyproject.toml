@@ -1,0 +1,16 @@
+[project]
+name = "cartographer-extraction-service"
+version = "0.1.0"
+description = "FastAPI sidecar for PDF parsing, LLM extraction, and embeddings"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "pymupdf",
+    "anthropic",
+    "voyageai",
+    "pydantic",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "httpx"]
