@@ -15,6 +15,7 @@ export function PapersLibrary() {
   const queryClient = useQueryClient();
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [previewId, setPreviewId] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   const { data: papers, isLoading, isError } = useQuery({
     queryKey: papersKey,
@@ -29,6 +30,7 @@ export function PapersLibrary() {
   const deleteMutation = useMutation({
     mutationFn: deletePaper,
     onSuccess: (_data, id) => {
+      setActionError(null);
       setSelectedIds((prev) => {
         const next = new Set(prev);
         next.delete(id);
@@ -36,12 +38,19 @@ export function PapersLibrary() {
       });
       queryClient.invalidateQueries({ queryKey: papersKey });
     },
+    onError: (error: Error) => {
+      setActionError(error.message);
+    },
   });
 
   const retryMutation = useMutation({
     mutationFn: retryPaper,
     onSuccess: () => {
+      setActionError(null);
       queryClient.invalidateQueries({ queryKey: papersKey });
+    },
+    onError: (error: Error) => {
+      setActionError(error.message);
     },
   });
 
@@ -73,6 +82,18 @@ export function PapersLibrary() {
   return (
     <div>
       <h1 className="mb-4 text-xl font-semibold">Papers</h1>
+
+      {actionError && (
+        <div className="mb-4 flex items-center justify-between rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+          <span>{actionError}</span>
+          <button
+            onClick={() => setActionError(null)}
+            className="ml-3 shrink-0 font-medium hover:underline"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {!papers || papers.length === 0 ? (
         <EmptyState />
