@@ -1,0 +1,30 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum PaperStatus {
+  queued
+  parsing
+  extracted
+  failed
+}
+
+model Paper {
+  id         String      @id @default(uuid())
+  filename   String
+  title      String
+  authors    String[]
+  year       Int?
+  sourceUrl  String?     @map("source_url")
+  status     PaperStatus @default(queued)
+  sections   String[]    @default([])
+  extraction Json        @default("{\"claims\":[],\"methods\":[],\"datasets\":[],\"entities\":[]}")
+  createdAt  DateTime    @default(now()) @map("created_at")
+
+  @@map("papers")
+}

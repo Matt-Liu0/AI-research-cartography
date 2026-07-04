@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-// Paper node — spec §4.6
+// Paper node — spec §4.6, extended per docs/superpowers/specs/2026-07-03-paper-comparison-board-design.md
 export const PaperSchema = z.object({
   id: z.string(),
   filename: z.string(),
@@ -8,6 +8,8 @@ export const PaperSchema = z.object({
   authors: z.array(z.string()),
   year: z.number().optional(),
   source_url: z.string().optional(),
+  status: z.enum(["queued", "parsing", "extracted", "failed"]),
+  sections: z.array(z.string()),
   extraction: z.object({
     claims: z.array(z.string()),
     methods: z.array(z.string()),
