@@ -21,6 +21,7 @@ model Paper {
   authors    String[]
   year       Int?
   sourceUrl  String?     @map("source_url")
+  storageKey String      @map("storage_key")
   status     PaperStatus @default(queued)
   sections   String[]    @default([])
   extraction Json        @default("{\"claims\":[],\"methods\":[],\"datasets\":[],\"entities\":[]}")

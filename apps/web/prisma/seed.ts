@@ -9,6 +9,7 @@ async function main() {
     data: [
       {
         filename: "attention-is-all-you-need.pdf",
+        storageKey: "seed/attention-is-all-you-need.pdf",
         title: "Attention Is All You Need",
         authors: ["Ashish Vaswani", "Noam Shazeer", "Niki Parmar"],
         year: 2017,
@@ -27,6 +28,7 @@ async function main() {
       },
       {
         filename: "bert-pretraining.pdf",
+        storageKey: "seed/bert-pretraining.pdf",
         title: "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding",
         authors: ["Jacob Devlin", "Ming-Wei Chang", "Kenton Lee"],
         year: 2018,
@@ -45,6 +47,7 @@ async function main() {
       },
       {
         filename: "retrieval-augmented-generation.pdf",
+        storageKey: "seed/retrieval-augmented-generation.pdf",
         title: "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks",
         authors: ["Patrick Lewis", "Ethan Perez", "Aleksandra Piktus"],
         year: 2020,
@@ -63,6 +66,7 @@ async function main() {
       },
       {
         filename: "scanned-thesis-draft.pdf",
+        storageKey: "seed/scanned-thesis-draft.pdf",
         title: "Untitled Draft",
         authors: [],
         status: "failed",
@@ -71,6 +75,7 @@ async function main() {
       },
       {
         filename: "graph-neural-networks-survey.pdf",
+        storageKey: "seed/graph-neural-networks-survey.pdf",
         title: "A Comprehensive Survey on Graph Neural Networks",
         authors: ["Zonghan Wu", "Shirui Pan", "Fengwen Chen"],
         year: 2019,
