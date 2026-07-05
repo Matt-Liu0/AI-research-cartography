@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import type { Paper } from "@/types/paper";
 
 const statusStyles: Record<Paper["status"], string> = {
@@ -25,6 +26,7 @@ export function PaperRow({
   onOpenPreview: (id: string) => void;
 }) {
   const selectable = paper.status === "extracted";
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
 
   return (
     <div className="flex items-center gap-3 border-b border-gray-200 px-4 py-3 last:border-b-0">
@@ -59,12 +61,33 @@ export function PaperRow({
         </button>
       )}
 
-      <button
-        onClick={() => onDelete(paper.id)}
-        className="shrink-0 rounded px-2 py-1 text-xs font-medium text-red-600 hover:bg-red-50"
-      >
-        Delete
-      </button>
+      {confirmingDelete ? (
+        <span className="flex shrink-0 items-center gap-1 text-xs">
+          <span className="text-gray-600">Delete?</span>
+          <button
+            onClick={() => {
+              setConfirmingDelete(false);
+              onDelete(paper.id);
+            }}
+            className="rounded px-2 py-1 font-medium text-red-600 hover:bg-red-50"
+          >
+            Confirm
+          </button>
+          <button
+            onClick={() => setConfirmingDelete(false)}
+            className="rounded px-2 py-1 font-medium text-gray-600 hover:bg-gray-100"
+          >
+            Cancel
+          </button>
+        </span>
+      ) : (
+        <button
+          onClick={() => setConfirmingDelete(true)}
+          className="shrink-0 rounded px-2 py-1 text-xs font-medium text-red-600 hover:bg-red-50"
+        >
+          Delete
+        </button>
+      )}
     </div>
   );
 }
