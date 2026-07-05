@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { papersKey } from "@/lib/queryKeys";
 import { deletePaper, fetchPapers, retryPaper } from "@/lib/api/papers";
@@ -11,11 +12,48 @@ import { PaperMetadataPreview } from "@/components/preview/PaperMetadataPreview"
 
 const IN_PROGRESS_STATUSES = new Set(["queued", "parsing"]);
 
+// Selection and preview state live in the URL (not useState) so a refresh
+// doesn't silently discard which papers were checked or which was open.
 export function PapersLibrary() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const queryClient = useQueryClient();
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [previewId, setPreviewId] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
+
+  const selectedIds = useMemo(() => {
+    const raw = searchParams.get("selected");
+    return new Set(raw ? raw.split(",").filter(Boolean) : []);
+  }, [searchParams]);
+
+  const previewId = searchParams.get("preview");
+
+  const updateParams = useCallback(
+    (updates: { selected?: Set<string>; preview?: string | null }) => {
+      const next = new URLSearchParams(searchParams.toString());
+      if ("selected" in updates) {
+        const ids = Array.from(updates.selected ?? []);
+        if (ids.length > 0) {
+          next.set("selected", ids.join(","));
+        } else {
+          next.delete("selected");
+        }
+      }
+      if ("preview" in updates) {
+        if (updates.preview) {
+          next.set("preview", updates.preview);
+        } else {
+          next.delete("preview");
+        }
+      }
+      const query = next.toString();
+      router.replace(query ? `/papers?${query}` : "/papers");
+    },
+    [router, searchParams]
+  );
+
+  function setPreviewId(id: string | null) {
+    updateParams({ preview: id });
+  }
 
   const { data: papers, isLoading, isError } = useQuery({
     queryKey: papersKey,
@@ -31,11 +69,9 @@ export function PapersLibrary() {
     mutationFn: deletePaper,
     onSuccess: (_data, id) => {
       setActionError(null);
-      setSelectedIds((prev) => {
-        const next = new Set(prev);
-        next.delete(id);
-        return next;
-      });
+      const next = new Set(selectedIds);
+      next.delete(id);
+      updateParams({ selected: next });
       queryClient.invalidateQueries({ queryKey: papersKey });
     },
     onError: (error: Error) => {
@@ -58,15 +94,13 @@ export function PapersLibrary() {
     const paper = papers?.find((p) => p.id === id);
     if (!paper || paper.status !== "extracted") return;
 
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-      return next;
-    });
+    const next = new Set(selectedIds);
+    if (next.has(id)) {
+      next.delete(id);
+    } else {
+      next.add(id);
+    }
+    updateParams({ selected: next });
   }
 
   if (isLoading) {
