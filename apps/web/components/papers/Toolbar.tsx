@@ -8,6 +8,15 @@ export function Toolbar({ selectedIds }: { selectedIds: Set<string> }) {
   const canCompare = selectedIds.size === MAX_COMPARE_PAPERS;
 
   function handleCompare() {
+    // /compare's URL contract (?a=&b=) and this destructuring both assume
+    // exactly 2 papers. Raising MAX_COMPARE_PAPERS alone would silently drop
+    // ids past the first 2 rather than enabling N-paper compare — both this
+    // function and the /compare route would need to change together.
+    if (MAX_COMPARE_PAPERS !== 2) {
+      throw new Error(
+        "Toolbar.handleCompare assumes MAX_COMPARE_PAPERS === 2; update the /compare URL contract before changing this constant."
+      );
+    }
     const [a, b] = Array.from(selectedIds);
     router.push(`/compare?a=${a}&b=${b}`);
   }
