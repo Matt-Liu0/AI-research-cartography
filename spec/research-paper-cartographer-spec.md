@@ -63,6 +63,21 @@ versioned graphs, citation-graph crawling beyond the uploaded set.
 4. Compute relationships between paper pairs
 5. Store all of this in a graph-shaped model and serve it to the frontend
 
+#### 4.1a Ingestion Implementation Steps (step 1 breakdown)
+
+Building step 1 (ingest/persist files) first, backend-only, in small verified+committed
+increments:
+
+1. MinIO added as local S3-compatible storage (`infra/docker-compose.yml`), with
+   `.env.example` `S3_*` defaults for local dev.
+2. Storage wrapper (`apps/web/lib/storage.ts`) — `uploadPdf(buffer, filename) -> { key }`
+   using the `S3_*` env vars.
+3. `POST /api/papers/upload` — accept one PDF, call the storage wrapper, create a
+   `Paper` row as `status: queued`.
+4. `/upload` page UI (deferred until backend is done).
+5. End-to-end verify: upload a real PDF, confirm it lands in MinIO and the row appears
+   in `/papers` with `status: queued`.
+
 ### 4.2 CSV Manifest Loading
 - Endpoint accepts a CSV alongside the PDF batch
 - Columns (V1, minimal): filename, title, authors, year, source_url, tags
